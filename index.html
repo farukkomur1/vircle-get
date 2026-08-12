@@ -23,6 +23,16 @@
   is no meta refresh, no script, no automatic anything. A page that renders, and
   a button a person taps.
 
+  CONFIRMED ON DEVICE 2026-08-12: tapped from inside Instagram, the store opens
+  from the button directly. No "open in browser" step is required.
+
+  THE PAGE IS THE FIX, NOT THE INSTRUCTION. Do not be tempted to "simplify" this
+  by putting the OneLink straight in the bio and deleting the page. That exact
+  configuration was measured and FAILS: bio -> OneLink -> store never completes,
+  because there is no page and therefore no gesture. The page is load-bearing.
+  The in-app notice below is only a fallback for a client that behaves
+  differently; it is deliberately not an instruction anyone must follow.
+
   ATTRIBUTION SURVIVES because the buttons are OneLink URLs. AppsFlyer registers
   the click on the way through, so pid and c still reach the install. Never
   append parameters to them: the template has Secure Shortlinks on, and an added
@@ -117,13 +127,19 @@
   a.btn:active { transform: translateY(1px); }
   .tiny { font-size: 13px; color: #6B5B2E; margin: 10px 0 0; }
 
-  /* The in-app browser notice. Hidden by default and revealed only when the
+  /* The in-app browser fallback. Hidden by default and revealed only when the
      page detects it is inside one, so desktop and Safari visitors never see
-     an instruction that does not apply to them. */
+     an instruction that does not apply to them.
+
+     It sits BELOW the button and is phrased as a recovery step, not a
+     precondition. It used to sit above and read "Open this in your browser
+     first", which was wrong: device testing on 2026-08-12 showed the store
+     opens straight from the button inside Instagram, so that wording put an
+     unnecessary step in front of the one thing this page exists to get tapped. */
   .inapp { display: none; }
   body.inapp-browser .inapp {
     display: block;
-    margin: 0 auto 18px;
+    margin: 18px auto 0;
     max-width: 340px;
     background: #FFF3D1;
     border: 1px solid #E8C766;
@@ -161,13 +177,6 @@
   Both buttons always shown rather than sniffing the OS. A wrong guess sends
   someone to a store they cannot use; the cost of being right is one extra line.
 -->
-<div class="inapp">
-  <b>Open this in your browser first</b>
-  Instagram and TikTok block App Store links inside their own browser.
-  Tap <span class="dots">&#8943;</span> at the top right, then
-  <b style="display:inline">Open in browser</b>. Then use the button below.
-</div>
-
 <!-- ONE button, because AppsFlyer OneLink decides the store from the device.
      Verified with real user agents rather than assumed:
 
@@ -187,6 +196,12 @@
 <a class="btn" id="get" href="https://vircle.onelink.me/zuWb?pid=web&c=organic_bio">Get Vircle</a>
 
 <p class="tiny">Free. iPhone and Android.</p>
+
+<div class="inapp">
+  <b>Store didn't open?</b>
+  Tap <span class="dots">&#8943;</span> at the top right, then
+  <b style="display:inline">Open in browser</b>, and tap the button again.
+</div>
 
 <div class="shots">
   <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/fd/19/b7/fd19b773-b7a4-d8bb-1bad-4b227aa1cf3f/image_2560.jpg/600x0w.jpg" alt="Create AI helpers for every part of your life">

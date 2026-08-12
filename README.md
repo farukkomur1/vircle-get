@@ -36,10 +36,14 @@ automatic redirects are denied.
 
 ## Links
 
+Served at `get.vircle.ai`, via a CNAME to `farukkomur1.github.io` in the
+vircle.ai zone, which Wix hosts. The `CNAME` file in this repo is what tells
+Pages to answer on that hostname; deleting it takes the custom domain down.
+
 Tag the bio per platform so installs can be attributed:
 
-    https://farukkomur1.github.io/vircle-get/?src=ig
-    https://farukkomur1.github.io/vircle-get/?src=tt
-    https://farukkomur1.github.io/vircle-get/?src=yt
+    https://get.vircle.ai/?src=ig
+    https://get.vircle.ai/?src=tt
+    https://get.vircle.ai/?src=yt
 
 `src` is mapped to the OneLink `pid` on load (instagram / tiktok / youtube).
