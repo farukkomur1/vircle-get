@@ -1,0 +1,240 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Get Vircle</title>
+<meta name="description" content="AI characters you play by text.">
+<meta property="og:title" content="Vircle: AI Companions &amp; Agents">
+<meta property="og:description" content="AI characters you play by text.">
+<meta property="og:image" content="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/1f/b5/d8/1fb5d8fe-a6c7-b1dc-fccc-14502fa68a07/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.jpeg/512x512bb.jpg">
+
+<!--
+  The install page.
+
+  WHY IT EXISTS. Every automatic path died inside Instagram's in-app browser.
+  Instagram renders links in a WKWebView where the host app decides which URL
+  schemes may launch, and it refuses itms-appss://, so the chain
+  onelink -> apps.apple.com -> itms-appss:// never completes and the viewer sees
+  a page that will not load. AppsFlyer's own remedy, a Social App Landing Page,
+  was configured correctly and never rendered: vircle-lp.onelink.me returns a
+  301 with a zero-length body on every request and every user agent.
+
+  WHY THIS WORKS. A button press is a USER GESTURE, and in-app browsers allow
+  gestures to open the store even when they block automatic redirects. So there
+  is no meta refresh, no script, no automatic anything. A page that renders, and
+  a button a person taps.
+
+  ATTRIBUTION SURVIVES because the buttons are OneLink URLs. AppsFlyer registers
+  the click on the way through, so pid and c still reach the install. Never
+  append parameters to them: the template has Secure Shortlinks on, and an added
+  parameter silently stops that click being attributed.
+
+  DESIGN is lifted from the App Store screenshots, which are the real marketing
+  system: amber field, charcoal ink, exactly ONE accented word in red, very
+  heavy tight-tracked type. Same rule the video renderer follows in brand.ts.
+  Two accents on one screen and it stops reading as Vircle.
+
+  The only external requests are Apple's CDN for the icon and the store
+  screenshots. Those exist for as long as the app does, and using them means the
+  page can never drift from what the store actually shows.
+-->
+
+<style>
+  :root {
+    --amber: #FFC220;
+    --ink: #2A2A2E;
+    --accent: #E8442C;
+    --cream: #F6EFE1;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body {
+    background: var(--amber);
+    color: var(--ink);
+    font: 400 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 40px 22px calc(34px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: center;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .icon {
+    width: 88px; height: 88px; border-radius: 20px; display: block;
+    box-shadow: 0 10px 30px rgba(42,42,46,.24);
+  }
+  h1 {
+    font-size: clamp(32px, 9.5vw, 46px);
+    line-height: 1.02;
+    font-weight: 800;
+    letter-spacing: -1.6px;
+    margin: 24px 0 10px;
+    max-width: 12ch;
+    text-align: center;
+  }
+  h1 em { color: var(--accent); font-style: normal; }
+  .sub {
+    margin: 0 0 26px; font-size: 16.5px; font-weight: 500;
+    opacity: .74; max-width: 28ch; text-align: center;
+  }
+
+  /* Screenshots, straight off the store. Scrolls inside its own track so the
+     page body never scrolls sideways. */
+  /* calc(100% + 44px) rather than 100vw: 100vw includes the scrollbar gutter on
+     desktop and, combined with the negative margins, pushes the body wider than
+     the viewport. That is a horizontal page scroll, which reads as broken. */
+  .shots {
+    display: flex; gap: 12px; overflow-x: auto;
+    width: calc(100% + 44px); max-width: calc(100vw);
+    padding: 14px 22px 6px; margin: 0 -22px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .shots::-webkit-scrollbar { display: none; }
+  /* Sized against VIEWPORT HEIGHT, not width. Sizing by width made them 524px
+     tall on a phone and pushed the button off screen, which is the one thing
+     this page cannot afford. Capping at 38vh keeps the whole row plus the CTA
+     in view, and the headline inside each screenshot stays legible, which it
+     was not at the original 300px (they rendered 139px wide and unreadable). */
+  .shots img {
+    height: min(38vh, 340px);
+    width: auto;
+    border-radius: 14px; flex: 0 0 auto;
+    scroll-snap-align: center;
+    box-shadow: 0 8px 26px rgba(42,42,46,.20);
+  }
+
+  a.btn {
+    display: block; width: 100%; max-width: 340px;
+    background: var(--ink); color: var(--cream);
+    text-decoration: none; font-weight: 700; font-size: 17.5px;
+    padding: 18px 22px; border-radius: 999px; margin-bottom: 11px;
+    text-align: center;
+    box-shadow: 0 8px 22px rgba(42,42,46,.22);
+  }
+  a.btn.alt {
+    background: transparent; color: var(--ink);
+    box-shadow: none; border: 2px solid rgba(42,42,46,.22);
+  }
+  a.btn:active { transform: translateY(1px); }
+  .tiny { font-size: 13px; color: #6B5B2E; margin: 10px 0 0; }
+
+  /* The in-app browser notice. Hidden by default and revealed only when the
+     page detects it is inside one, so desktop and Safari visitors never see
+     an instruction that does not apply to them. */
+  .inapp { display: none; }
+  body.inapp-browser .inapp {
+    display: block;
+    margin: 0 auto 18px;
+    max-width: 340px;
+    background: #FFF3D1;
+    border: 1px solid #E8C766;
+    border-radius: 12px;
+    padding: 13px 15px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #4A3B14;
+    text-align: left;
+  }
+  body.inapp-browser .inapp b { display: block; margin-bottom: 4px; color: #2B2308; }
+  body.inapp-browser .inapp .dots {
+    display: inline-block; font-weight: 700; letter-spacing: 1px;
+    background: #fff; border: 1px solid #E8C766; border-radius: 5px;
+    padding: 0 6px; margin: 0 2px;
+  }
+  .foot {
+    margin-top: 20px; font-size: 12.5px; opacity: .6;
+    max-width: 32ch; text-align: center; line-height: 1.5;
+  }
+</style>
+
+<img class="icon" alt="Vircle"
+     src="https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/1f/b5/d8/1fb5d8fe-a6c7-b1dc-fccc-14502fa68a07/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.jpeg/512x512bb.jpg">
+
+<h1>AI characters you play by <em>text</em>.</h1>
+<p class="sub">Stories and companions that reply like people.</p>
+
+<!--
+  BUTTONS BEFORE SCREENSHOTS, deliberately. Sizing the screenshots to be legible
+  made them tall enough to push the CTA below the fold, and a page whose only
+  job is one tap must never hide the thing being tapped. Ask first, justify
+  underneath.
+
+  Both buttons always shown rather than sniffing the OS. A wrong guess sends
+  someone to a store they cannot use; the cost of being right is one extra line.
+-->
+<div class="inapp">
+  <b>Open this in your browser first</b>
+  Instagram and TikTok block App Store links inside their own browser.
+  Tap <span class="dots">&#8943;</span> at the top right, then
+  <b style="display:inline">Open in browser</b>. Then use the button below.
+</div>
+
+<!-- ONE button, because AppsFlyer OneLink decides the store from the device.
+     Verified with real user agents rather than assumed:
+
+       iOS      -> apps.apple.com/US/app/id6752336576
+       Android  -> market://details?id=com.tech.vircle   (opens the Play app)
+       desktop  -> the App Store web page
+
+     The pid and campaign survive the hop: the Android referrer comes back
+     carrying pid=instagram&c=organic_bio, so attribution is recorded at click
+     time rather than guessed later.
+
+     Earlier this route was rejected because bio -> OneLink -> store failed on
+     a real device. That objection is gone: it failed because Instagram blocks
+     store links from its own browser, which is the thing the notice above now
+     handles. Once the visitor is in Safari there is no such restriction, and a
+     redirect is fine. -->
+<a class="btn" id="get" href="https://vircle.onelink.me/zuWb?pid=web&c=organic_bio">Get Vircle</a>
+
+<p class="tiny">Free. iPhone and Android.</p>
+
+<div class="shots">
+  <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/fd/19/b7/fd19b773-b7a4-d8bb-1bad-4b227aa1cf3f/image_2560.jpg/600x0w.jpg" alt="Create AI helpers for every part of your life">
+  <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/9b/b1/13/9bb113ea-dbc3-b644-eeae-4a79202031cf/image_2561.jpg/600x0w.jpg" alt="Your personal AI experts, mentors, assistants and friends">
+  <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/40/1c/f3/401cf36e-e450-9ac0-bdc5-adab3a2b3a16/image_2563.jpg/600x0w.jpg" alt="An AI that initiates, not just reacts">
+  <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/24/5b/49/245b49d2-ef76-230c-d7f6-ee38424041f5/image_2566.jpg/600x0w.jpg" alt="Let AI be part of your daily life">
+  <img src="https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/dc/86/3e/dc863e09-629d-691d-c1da-69354b46b739/image_2562.jpg/600x0w.jpg" alt="Smart reminders that actually remember you">
+</div>
+
+<p class="foot">Free to download. AI-generated characters; every story is fiction.</p>
+
+<script>
+/* The ONLY script on this page, and it touches nothing but a class name.
+ *
+ * It does not intercept clicks, rewrite hrefs, or navigate. Those are exactly
+ * what broke this on Wix: the framework cancelled the link and did the
+ * navigation itself, so the tap never reached the OS as a link activation.
+ *
+ * All this does is detect an in-app browser and reveal an instruction. The
+ * anchors stay as signal.org writes them -- class and href, nothing else, and
+ * no listener is ever attached to them.
+ *
+ * Detection is a user-agent test because there is no reliable feature test for
+ * "am I inside someone else's webview". Instagram, Facebook, Messenger,
+ * TikTok, Snapchat, LinkedIn and Twitter all announce themselves in the UA. A
+ * false positive costs a tip that was merely unnecessary; a false negative
+ * costs the install. So it errs toward showing it.
+ */
+(function () {
+  var ua = navigator.userAgent || "";
+  if (/Instagram|FBAN|FBAV|FB_IAB|Messenger|TikTok|BytedanceWebview|Snapchat|LinkedInApp|Twitter/i.test(ua)) {
+    document.body.className += " inapp-browser";
+  }
+
+  /* Carry the channel into the OneLink so an install can be attributed to the
+   * platform it came from. The bios are tagged ?src=ig / tt / yt.
+   *
+   * The href is set ON LOAD, never on click. By the time anyone taps, this is
+   * an ordinary anchor with an ordinary href and no listener -- which is the
+   * whole difference from the Wix page, where the click itself was cancelled
+   * and replaced by a scripted navigation.
+   */
+  var PID = { ig: "instagram", tt: "tiktok", yt: "youtube" };
+  var src = (location.search.match(/[?&]src=([a-z]+)/i) || [])[1];
+  var pid = PID[(src || "").toLowerCase()];
+  if (pid) {
+    var a = document.getElementById("get");
+    if (a) a.href = "https://vircle.onelink.me/zuWb?pid=" + pid + "&c=organic_bio";
+  }
+})();
+</script>
